@@ -1,0 +1,11 @@
+---
+# Main playbook — configures web tier hosts
+# Run: ansible-playbook site.yml -e environment=dev
+- name: Configure web tier
+  hosts: web
+  become: true
+
+  roles:
+    - security-baseline
+    - nginx
+    - cloudwatch-agent

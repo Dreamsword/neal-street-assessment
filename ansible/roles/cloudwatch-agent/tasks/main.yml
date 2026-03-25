@@ -1,0 +1,20 @@
+---
+- name: Install CloudWatch agent
+  ansible.builtin.dnf:
+    name: amazon-cloudwatch-agent
+    state: present
+
+- name: Deploy CloudWatch agent config
+  ansible.builtin.template:
+    src: cloudwatch-agent.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart cloudwatch agent
+
+- name: Enable and start CloudWatch agent
+  ansible.builtin.systemd:
+    name: amazon-cloudwatch-agent
+    state: started
+    enabled: true

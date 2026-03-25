@@ -1,0 +1,50 @@
+---
+# Lightweight security baseline for a public-facing workload
+
+- name: Ensure system packages are up to date
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    security: true
+
+- name: Enable automatic security updates
+  ansible.builtin.dnf:
+    name: dnf-automatic
+    state: present
+
+- name: Configure dnf-automatic for security updates only
+  ansible.builtin.lineinfile:
+    path: /etc/dnf/automatic.conf
+    regexp: "^upgrade_type"
+    line: "upgrade_type = security"
+
+- name: Enable dnf-automatic timer
+  ansible.builtin.systemd:
+    name: dnf-automatic.timer
+    state: started
+    enabled: true
+
+- name: Disable root SSH login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+    validate: sshd -t -f %s
+  notify: Restart sshd
+
+- name: Disable password authentication (key-only)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    validate: sshd -t -f %s
+  notify: Restart sshd
+
+- name: Set SSH idle timeout (5 minutes)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?ClientAliveInterval"
+    line: "ClientAliveInterval 300"
+    validate: sshd -t -f %s
+  notify: Restart sshd
+

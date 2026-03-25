@@ -1,0 +1,21 @@
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.tfplan
+crash.log
+!.terraform.lock.hcl
+
+# Ansible
+*.retry
+
+# OS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Private notes (not for submission)
+NOTES.md

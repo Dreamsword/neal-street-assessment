@@ -1,0 +1,6 @@
+{
+  "service": "{{ project | default('rewards') }}",
+  "status": "ok",
+  "commit": "{{ lookup('env', 'GIT_COMMIT') | default('unknown', true) }}",
+  "region": "{{ aws_region | default('eu-west-1') }}"
+}

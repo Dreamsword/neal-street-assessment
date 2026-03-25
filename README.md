@@ -23,6 +23,46 @@ And create the S3 state backend first (see Quick Start step 1 below).
 
 ---
 
+## AI Assistance Disclosure
+
+AI tools were used throughout this assessment as productivity accelerators. All architectural decisions, code reviews, and fixes were directed and validated by me.
+
+### Tools Used
+- **Claude (Anthropic)** — primary assistant for code generation, architecture review, and documentation
+- **GitHub Copilot** — inline code completion
+
+### How AI Was Used
+
+**Architecture planning:**
+> *"I have a take-home DevOps assessment. The requirements are: EC2 behind an ALB, private subnets, Terraform for infrastructure, Ansible for OS config, GitHub Actions CI. No NAT Gateway to keep costs low. What's the cleanest architecture that satisfies all requirements without over-engineering?"*
+
+From this I validated my decision to use VPC endpoints instead of a NAT Gateway, and confirmed the ALB dual-AZ subnet requirement.
+
+**Terraform code generation:**
+> *"Write a Terraform VPC module with one public subnet for an ALB and one private subnet for EC2. No NAT Gateway — use VPC endpoints for SSM and CloudWatch instead. Single AZ is fine. Use consistent tagging via locals."*
+
+I reviewed every resource, caught that the default `allowed_ssh_cidr` needed a clearer comment explaining it's unreachable from the internet due to the private subnet, and added the IMDSv2 requirement.
+
+**Ansible roles:**
+> *"Write three Ansible roles for Amazon Linux 2023: security-baseline (SSH hardening, auto security updates), nginx (serve a static health JSON, validate config before deploy), cloudwatch-agent (ship nginx and system logs to CloudWatch). Use systemd handlers, validate sshd_config changes."*
+
+After generation I identified and fixed: an invalid Jinja2 `lookup()` in the static YAML inventory, a hardcoded SSH key path in `ansible.cfg` that would break CI, and an ansible-lint error on `state: latest`.
+
+**CI/CD pipeline:**
+> *"Write a GitHub Actions workflow with three jobs: lint (terraform fmt, validate, ansible-lint — no credentials needed), plan (terraform plan on PRs, post output as PR comment), deploy (terraform apply then ansible-playbook on merge to main). Add concurrency control to prevent overlapping deploys."*
+
+I added the `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env var after seeing Node.js 20 deprecation warnings on the first run.
+
+**SOLUTION.md:**
+> *"Help me write a SOLUTION.md that explains: why VPC endpoints over NAT Gateway, why S3 native locking over DynamoDB, why SSM Parameter Store over Secrets Manager, why CloudWatch Logs over metrics, the security baseline choices, and how to promote to prod. Be opinionated and explain trade-offs honestly."*
+
+I added the HTTPS/ACM section independently after reviewing the prod promotion plan — the AI initially only mentioned HTTPS for prod, and I corrected this to note it should apply to both environments once a domain is available.
+
+### My Assessment of AI-Assisted Work
+Using AI for this assessment reflects how I work day-to-day. At SoulRefiner I used Claude extensively for infrastructure automation, documentation, and debugging. The value isn't in generating code blindly — it's in directing the approach, reviewing outputs critically, and knowing when something is wrong. Every file in this repository has been read, understood, and where necessary corrected by me.
+
+---
+
 ## Prerequisites
 
 - AWS CLI configured with appropriate credentials

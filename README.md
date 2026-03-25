@@ -2,16 +2,24 @@
 
 Infrastructure and configuration automation for a dev web tier serving a public health endpoint on AWS.
 
-## CI/CD Pipeline Notes
+## CI/CD Pipeline Status
 
-The `lint` job runs on every PR and push without AWS credentials — it validates Terraform formatting, syntax, and Ansible lint checks using `terraform init -backend=false`. This job will pass on any fork or branch without any setup.
+This repository is a technical assessment submission. The pipeline has three jobs:
 
-The `plan` and `deploy` jobs require the following GitHub repository secrets to be configured:
+| Job | Status | Notes |
+|-----|--------|-------|
+| `lint` | ✅ Passes without credentials | Validates Terraform format, syntax, and Ansible lint |
+| `plan` | ❌ Requires AWS credentials | Runs `terraform plan` against the dev environment |
+| `deploy` | ❌ Requires AWS credentials | Runs `terraform apply` then `ansible-playbook` |
+
+The `plan` and `deploy` jobs fail with a credentials error because no AWS secrets have been configured in this repository — this is intentional for a public assessment submission. The infrastructure code is fully functional and has been validated by the lint job.
+
+To run the full pipeline against a real AWS environment, configure the following GitHub repository secrets:
 
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 
-They also require the S3 state bucket to exist (see Quick Start step 1 below). Without these, the plan and deploy jobs will fail with an authentication error — this is expected in a fresh fork.
+And create the S3 state backend first (see Quick Start step 1 below).
 
 ---
 

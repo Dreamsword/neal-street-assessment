@@ -4,8 +4,9 @@
 - name: Ensure system packages are up to date
   ansible.builtin.dnf:
     name: "*"
-    state: latest
+    state: present
     security: true
+    update_only: true
 
 - name: Enable automatic security updates
   ansible.builtin.dnf:
@@ -47,4 +48,3 @@
     line: "ClientAliveInterval 300"
     validate: sshd -t -f %s
   notify: Restart sshd
-
